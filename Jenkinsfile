@@ -1,5 +1,9 @@
 #!groovy
 
+def postSlack(color, message) {
+    slackSend channel: "#eng-frontend", color: color, message: message
+}
+
 // Enable concurrent builds of this project to be throttled using the
 // throttle-concurrents Jenkins plugin (https://plugins.jenkins.io/throttle-concurrents)
 
@@ -68,6 +72,9 @@ node {
         sh "yarn install"
       }
     }
+
+    postSlack(color: 'good', message: 'Testing a happy message from Slack about client deployments')
+    postSlack(color: 'danger', message: 'Testing an unhappy message from Slack about client deployments')
 
     stage('Test') {
         nodeEnv.inside("-e HOME=${workspace}") {
