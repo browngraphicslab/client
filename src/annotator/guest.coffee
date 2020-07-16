@@ -70,6 +70,7 @@ module.exports = class Guest extends Delegator
       onAnnotate: ->
         self.createAnnotation()
         document.getSelection().removeAllRanges()
+        parent.postMessage { 'message': 'annotation created' }, window.origin
       onHighlight: ->
         self.setVisibleHighlights(true)
         self.createHighlight()
@@ -179,6 +180,12 @@ module.exports = class Guest extends Delegator
           defaultNotPrevented = @element[0].dispatchEvent(event)
           if defaultNotPrevented
             scrollIntoView(anchor.highlights[0])
+
+    crossframe.on 'linkToDash', (id) => 
+      document.dispatchEvent new CustomEvent('linkToDash', {
+        detail: id
+        bubbles: true
+      })
 
     crossframe.on 'getDocumentInfo', (cb) =>
       this.getDocumentInfo()
