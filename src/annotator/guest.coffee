@@ -181,9 +181,10 @@ module.exports = class Guest extends Delegator
           if defaultNotPrevented
             scrollIntoView(anchor.highlights[0])
 
-    crossframe.on 'linkToDash', (id) => 
+    crossframe.on 'linkToDash', (id, uri) => 
+      console.log(id + ' ' + uri)
       document.dispatchEvent new CustomEvent('linkToDash', {
-        detail: id
+        detail: id + ' ' + uri # how to pass in multiple values in coffeescript syntax??
         bubbles: true
       })
 
