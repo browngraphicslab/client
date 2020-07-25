@@ -176,6 +176,18 @@ export default function FrameSync(annotationsService, bridge, store) {
       store.setSidebarOpened(true);
     });
 
+    bridge.on('dashScrollToAnnotation', function (annotationId) {
+      const annotation = store.findAnnotationByID(annotationId)
+      const tag = annotation && annotation.$orphan === false
+        ? annotation.$tag 
+        : null;
+      if (tag) {
+        bridge.call('scrollToAnnotation', tag);
+      } else {
+        console.log("DASH: could not find annotation " + annotationId)
+      }
+    });
+
     // These invoke the matching methods by name on the Guests
     bridge.on('showSidebar', function () {
       bridge.call('showSidebar');
