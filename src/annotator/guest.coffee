@@ -1,4 +1,4 @@
- scrollIntoView = require('scroll-into-view')
+scrollIntoView = require('scroll-into-view')
 CustomEvent = require('custom-event')
 
 Delegator = require('./delegator')
