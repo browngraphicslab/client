@@ -1,4 +1,4 @@
-scrollIntoView = require('scroll-into-view')
+ scrollIntoView = require('scroll-into-view')
 CustomEvent = require('custom-event')
 
 Delegator = require('./delegator')
@@ -77,6 +77,8 @@ module.exports = class Guest extends Delegator
         document.getSelection().removeAllRanges()
       onShowAnnotations: (anns) ->
         self.selectAnnotations(anns)
+      onScroll: (annotationId) ->
+        self.dashScroll(annotationId)
     })
     this.selections = selections(document).subscribe
       next: (range) ->
@@ -182,7 +184,6 @@ module.exports = class Guest extends Delegator
             scrollIntoView(anchor.highlights[0])
 
     crossframe.on 'linkToDash', (id, uri) => 
-      console.log(id + ' ' + uri)
       document.dispatchEvent new CustomEvent('linkToDash', {
         detail: id + ' ' + uri # how to pass in multiple values in coffeescript syntax??
         bubbles: true
@@ -377,6 +378,9 @@ module.exports = class Guest extends Delegator
   createHighlight: ->
     return this.createAnnotation({$highlight: true})
 
+  dashScroll: (annotationId) -> 
+    @crossframe.call('dashScrollToAnnotation', annotationId)
+
   # Create a blank comment (AKA "page note")
   createComment: () ->
     annotation = {}
@@ -511,3 +515,4 @@ module.exports = class Guest extends Delegator
 
     @visibleHighlights = shouldShowHighlights
     @toolbar?.highlightsVisible = shouldShowHighlights
+ 

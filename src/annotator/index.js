@@ -89,28 +89,4 @@ $.noConflict(true)(function () {
       bubbles: true
     }));
   })
-
-  document.addEventListener('scrollToAnnotation', function (e) {
-    const annotationId = e.detail.id;
-    console.log("DASH scrollToAnnotation received", annotationId);
-    
-    // call dashScrollToAnnotation in sidebar
-
-    // const annotation = useStore(store => {
-    //   return store.findAnnotationByID(annotationId)
-    // });
-    // const tag = annotation && annotation.$orphan === false
-    //   ? linkedAnnotation.$tag 
-    //   : null;
-    // const directLinkedTab = linkedAnnotation
-    //   ? tabForAnnotation(linkedAnnotation)
-    //   : null;
-    // useEffect(() => {
-    //   if (tag) {
-    //     frameSync.focusAnnotations([tag]);
-    //     frameSync.scrollToAnnotation(tag);
-    //     selectTab(directLinkedTab);
-    //   }
-    // }, [directLinkedTab, frameSync, tag, selectTab]);
-  })
 });
