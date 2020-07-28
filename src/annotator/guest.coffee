@@ -337,7 +337,7 @@ module.exports = class Guest extends Delegator
       highlighter.removeHighlights(unhighlight)
       this.plugins.BucketBar?.update()
 
-  createAnnotation: (annotation = {}) ->
+  createAnnotation: (annotation = {}, isPlaceholder = false) ->
     self = this
     root = @element[0]
 
@@ -373,9 +373,7 @@ module.exports = class Guest extends Delegator
     targets.then(-> self.publish('beforeAnnotationCreated', [annotation]))
     targets.then(-> self.anchor(annotation))
 
-    if isPlaceholder
-        parent.postMessage { 'message': 'annotation created' }, window.origin # notify Dash to start link, and keep sidebar hidden
-    else
+    if !isPlaceholder
       @crossframe?.call('showSidebar') unless annotation.$highlight 
 
     annotation

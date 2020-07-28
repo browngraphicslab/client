@@ -97,10 +97,10 @@ export default function annotationsService(api, store) {
           isPrivate: !metadata.isPublic(annotation),
         });
   
-        if (annotation.isPlaceholder) {
+        if (annotation.isPlaceholder) { // save new annotation immediately if it's a placeholder to be linked to Dash
           try {
             console.log("Saving annotation");
-            await save(annotation);
+            return save(annotation);
           } catch (err) {
             console.log("Saving annotation failed");
           }

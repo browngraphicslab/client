@@ -117,7 +117,7 @@ export default function FrameSync(annotationsService, bridge, store) {
    */
   function setupSyncFromFrame() {
     // A new annotation, note or highlight was created in the frame
-    bridge.on('beforeCreateAnnotation', function (event) {
+    bridge.on('beforeCreateAnnotation', async function (event) {
       const annot = Object.assign({}, event.msg, { $tag: event.tag });
       // If user is not logged in, we can't really create a meaningful highlight
       // or annotation. Instead, we need to open the sidebar, show an error,
@@ -132,7 +132,8 @@ export default function FrameSync(annotationsService, bridge, store) {
       inFrame.add(event.tag);
 
       // Create the new annotation in the sidebar.
-      annotationsService.create(annot);
+      const newAnnotation = await annotationsService.create(annot);
+      annot.isPlaceholder && bridge.call('linkToDash', newAnnotation.id, newAnnotation.uri); // after annotation is saved, start link in Dash if it's a placeholder
     });
 
     bridge.on('destroyFrame', destroyFrame.bind(this));
