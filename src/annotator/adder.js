@@ -53,7 +53,7 @@ function nearestPositionedAncestor(el) {
 
 /**
  * @typedef AdderOptions
- * @prop {() => any} onAnnotate - Callback invoked when "Annotate" button is clicked
+ * @prop {(isPlaceholder) => any} onAnnotate - Callback invoked when "Annotate" button is clicked
  * @prop {() => any} onHighlight - Callback invoked when "Highlight" button is clicked
  * @prop {(annotationId) => any} onScroll - Callback invoked when "Highlight" button is clicked
  * @prop {(annotations: Object[]) => any} onShowAnnotations -
@@ -223,7 +223,11 @@ export class Adder {
     const handleCommand = command => {
       switch (command) {
         case 'annotate':
-          this._onAnnotate();
+          this._onAnnotate(false);
+          this.hide();
+          break;
+        case 'linkToDash':
+          this._onAnnotate(true);
           this.hide();
           break;
         case 'highlight':
@@ -238,7 +242,7 @@ export class Adder {
       }
     };
 
-    // document.removeEventListener('scrollToAnnotation', this._scroll);
+    document.removeEventListener('scrollToAnnotation', this._scroll.bind(this));
     document.addEventListener('scrollToAnnotation', this._scroll.bind(this));
 
     render(

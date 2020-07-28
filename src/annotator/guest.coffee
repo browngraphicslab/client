@@ -67,10 +67,9 @@ module.exports = class Guest extends Delegator
 
     self = this
     this.adderCtrl = new adder.Adder(@adder[0], {
-      onAnnotate: ->
-        self.createAnnotation()
+      onAnnotate: (isPlaceholder) ->
+        self.createAnnotation({}, isPlaceholder)
         document.getSelection().removeAllRanges()
-        parent.postMessage { 'message': 'annotation created' }, window.origin
       onHighlight: ->
         self.setVisibleHighlights(true)
         self.createHighlight()
@@ -363,16 +362,22 @@ module.exports = class Guest extends Delegator
       source = info.uri
       annotation.target = ({source, selector} for selector in selectors)
 
+    annotation.isPlaceholder = isPlaceholder
+
     info = this.getDocumentInfo()
     selectors = Promise.all(ranges.map(getSelectors))
 
-    metadata = info.then(setDocumentInfo)
+    metadata = info.then(setDocumentInfo)    
     targets = Promise.all([info, selectors]).then(setTargets)
 
     targets.then(-> self.publish('beforeAnnotationCreated', [annotation]))
     targets.then(-> self.anchor(annotation))
 
-   # @crossframe?.call('showSidebar') unless annotation.$highlight
+    if isPlaceholder
+        parent.postMessage { 'message': 'annotation created' }, window.origin # notify Dash to start link, and keep sidebar hidden
+    else
+      @crossframe?.call('showSidebar') unless annotation.$highlight 
+
     annotation
 
   createHighlight: ->

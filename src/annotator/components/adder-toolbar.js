@@ -116,6 +116,12 @@ export default function AdderToolbar({
           label="Highlight"
           shortcut={highlightShortcut}
         />
+        <ToolbarButton
+          icon="annotate"
+          onClick={e => handleCommand(e, 'linkToDash')}
+          label="Link to Dash"
+          shortcut={annotateShortcut}
+        />
         {annotationCount > 0 && (
           <div className="annotator-adder-actions__separator" />
         )}

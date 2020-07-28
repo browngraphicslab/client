@@ -93,16 +93,17 @@ export default function annotationsService(api, store) {
       if (!metadata.isHighlight(annotation)) {
         store.createDraft(annotation, {
           tags: annotation.tags,
-          text: "placeholder",
-          // text: annotation.text,
+          text: annotation.isPlaceholder ? "placeholder" : annotation.text,
           isPrivate: !metadata.isPublic(annotation),
         });
   
-        try {
-          console.log("Saving annotation");
-          await save(annotation);
-        } catch (err) {
-          console.log("Saving annotation failed");
+        if (annotation.isPlaceholder) {
+          try {
+            console.log("Saving annotation");
+            await save(annotation);
+          } catch (err) {
+            console.log("Saving annotation failed");
+          }
         }
       }
 
