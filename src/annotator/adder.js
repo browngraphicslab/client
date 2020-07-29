@@ -221,11 +221,18 @@ export class Adder {
     this._onScroll(annotationId);
   }
 
-  _edit(e) {
-    console.log("DASH editAnnotation received");
+  _addLink(e) {
+    console.log("DASH addLink received");
     const annotationId = e.detail.id;
     const newHyperlink = e.detail.newHyperlink
-    this._onEdit(annotationId, newHyperlink);
+    this._onEdit(annotationId, newHyperlink, "add");
+  }
+
+  _deleteLink(e) {
+    console.log("DASH deleteLink received");
+    const annotationId = e.detail.id;
+    const targetUrl = e.detail.targetUrl
+    this._onEdit(annotationId, targetUrl, "delete");
   }
 
   _render() {
@@ -254,8 +261,11 @@ export class Adder {
     document.removeEventListener('scrollToAnnotation', this._scroll.bind(this));
     document.addEventListener('scrollToAnnotation', this._scroll.bind(this));
 
-    document.removeEventListener('editAnnotation', this._edit.bind(this));
-    document.addEventListener('editAnnotation', this._edit.bind(this));
+    document.removeEventListener('addLink', this._addLink.bind(this));
+    document.addEventListener('addLink', this._addLink.bind(this));
+
+    document.removeEventListener('deleteLink', this._deleteLink.bind(this));
+    document.addEventListener('deleteLink', this._deleteLink.bind(this));
 
     render(
       <AdderToolbar

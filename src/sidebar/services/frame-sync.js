@@ -189,12 +189,20 @@ export default function FrameSync(annotationsService, bridge, store) {
       }
     });
 
-    bridge.on('dashEditAnnotation', function (annotationId, newHyperlink) {
+    bridge.on('dashEditAnnotation', function (annotationId, link, command) {
       const annotation = store.findAnnotationByID(annotationId);
       if (annotation) {
-        const newText = annotation.text === "placeholder" ? newHyperlink : annotation.text + '\n\n' + newHyperlink; // if this is not the first link in the annotation, add link on new line
+        const oldText = annotation.text
         const newAnnotation = Object.assign({}, annotation);
-        newAnnotation.text = newText;
+        switch (command) {
+          case "add":
+            newAnnotation.text = (oldText === "placeholder") ? link : oldText + '\n\n' + link; // if this is not the first hyperlink in the annotation, add link on new line
+            break;
+          case "delete":
+            const regex = new RegExp(`\\[[^\\]]*\\]\\(${link}\\)`); // finds the link (written in [title](hyperlink) format) to be deleted
+            newAnnotation.text = oldText.replace(regex, ""); // deletes the target link
+            break;
+        };
         annotationsService.save(newAnnotation);
       } else {
         console.log("DASH: annotation not found" + annotationId);
