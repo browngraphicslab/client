@@ -183,10 +183,12 @@ module.exports = class Guest extends Delegator
           defaultNotPrevented = @element[0].dispatchEvent(event)
           if defaultNotPrevented
             scrollIntoView(anchor.highlights[0])
+      
+      document.dispatchEvent new Event('scrollSuccess') # notify Dash that annotations were loaded and scrolling was successful
 
     crossframe.on 'linkToDash', (id, uri) => 
       document.dispatchEvent new CustomEvent('linkToDash', {
-        detail: id + ' ' + uri # how to pass in multiple values in coffeescript syntax??
+        detail: id + ' ' + uri # how to pass in multiple values in coffeescript??
         bubbles: true
       })
 
