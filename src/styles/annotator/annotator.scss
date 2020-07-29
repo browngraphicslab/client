@@ -178,7 +178,7 @@ $sidebar-collapse-transition-time: 150ms;
   .annotator-frame {
     transition: margin-left $sidebar-collapse-transition-time
       cubic-bezier(0.55, 0, 0.2, 0.8);
-    width: 428px;
-    margin-left: -428px;
+    width: 250px;
+    margin-left: -250px;
   }
 }
