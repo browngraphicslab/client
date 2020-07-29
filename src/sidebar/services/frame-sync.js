@@ -178,14 +178,25 @@ export default function FrameSync(annotationsService, bridge, store) {
     });
 
     bridge.on('dashScrollToAnnotation', function (annotationId) {
-      const annotation = store.findAnnotationByID(annotationId)
+      const annotation = store.findAnnotationByID(annotationId);
       const tag = annotation && annotation.$orphan === false
         ? annotation.$tag 
         : null;
       if (tag) {
         bridge.call('scrollToAnnotation', tag);
       } else {
-        console.log("DASH: could not find annotation " + annotationId)
+        console.log("DASH: annotation not found" + annotationId);
+      }
+    });
+
+    bridge.on('dashEditAnnotation', function (annotationId, newText) {
+      const annotation = store.findAnnotationByID(annotationId);
+      if (annotation) {
+        const newAnnot = Object.assign({}, annotation);
+        newAnnot.text = newText;
+        annotationsService.save(newAnnot);
+      } else {
+        console.log("DASH: annotation not found" + annotationId);
       }
     });
 

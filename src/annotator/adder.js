@@ -56,6 +56,7 @@ function nearestPositionedAncestor(el) {
  * @prop {(isPlaceholder) => any} onAnnotate - Callback invoked when "Annotate" button is clicked
  * @prop {() => any} onHighlight - Callback invoked when "Highlight" button is clicked
  * @prop {(annotationId) => any} onScroll - Callback invoked when "Highlight" button is clicked
+ * @prop {(annotationId, newText) => any} onEdit - Callback invoked when "Highlight" button is clicked
  * @prop {(annotations: Object[]) => any} onShowAnnotations -
  *   Callback invoked when  "Show" button is clicked
  */
@@ -108,6 +109,7 @@ export class Adder {
     this._onAnnotate = options.onAnnotate;
     this._onHighlight = options.onHighlight;
     this._onScroll = options.onScroll;
+    this._onEdit = options.onEdit;
     this._onShowAnnotations = options.onShowAnnotations;
     /**
      * Annotation objects associated with the current selection. If non-empty,
@@ -214,9 +216,16 @@ export class Adder {
   }
 
   _scroll(e) {
-    console.log("DASH scrollToAnnotation received", e.detail);
+    console.log("DASH scrollToAnnotation received");
     const annotationId = e.detail;
     this._onScroll(annotationId);
+  }
+
+  _edit(e) {
+    console.log("DASH editAnnotation received");
+    const annotationId = e.detail.id;
+    const newText = e.detail.newText
+    this._onEdit(annotationId, newText);
   }
 
   _render() {
@@ -244,6 +253,9 @@ export class Adder {
 
     document.removeEventListener('scrollToAnnotation', this._scroll.bind(this));
     document.addEventListener('scrollToAnnotation', this._scroll.bind(this));
+
+    document.removeEventListener('editAnnotation', this._edit.bind(this));
+    document.addEventListener('editAnnotation', this._edit.bind(this));
 
     render(
       <AdderToolbar
