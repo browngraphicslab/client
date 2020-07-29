@@ -189,12 +189,13 @@ export default function FrameSync(annotationsService, bridge, store) {
       }
     });
 
-    bridge.on('dashEditAnnotation', function (annotationId, newText) {
+    bridge.on('dashEditAnnotation', function (annotationId, newHyperlink) {
       const annotation = store.findAnnotationByID(annotationId);
       if (annotation) {
-        const newAnnot = Object.assign({}, annotation);
-        newAnnot.text = newText;
-        annotationsService.save(newAnnot);
+        const newText = annotation.text === "placeholder" ? newHyperlink : annotation.text + '\n\n' + newHyperlink; // if this is not the first link in the annotation, add link on new line
+        const newAnnotation = Object.assign({}, annotation);
+        newAnnotation.text = newText;
+        annotationsService.save(newAnnotation);
       } else {
         console.log("DASH: annotation not found" + annotationId);
       }

@@ -224,8 +224,8 @@ export class Adder {
   _edit(e) {
     console.log("DASH editAnnotation received");
     const annotationId = e.detail.id;
-    const newText = e.detail.newText
-    this._onEdit(annotationId, newText);
+    const newHyperlink = e.detail.newHyperlink
+    this._onEdit(annotationId, newHyperlink);
   }
 
   _render() {

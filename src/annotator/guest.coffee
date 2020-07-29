@@ -78,8 +78,8 @@ module.exports = class Guest extends Delegator
         self.selectAnnotations(anns)
       onScroll: (annotationId) ->
         self.dashScroll(annotationId)
-      onEdit: (annotationId, newText) -> 
-        self.dashEdit(annotationId, newText)
+      onEdit: (annotationId, newHyperlink) -> 
+        self.dashEdit(annotationId, newHyperlink)
     })
     this.selections = selections(document).subscribe
       next: (range) ->
@@ -386,8 +386,8 @@ module.exports = class Guest extends Delegator
   dashScroll: (annotationId) -> 
     @crossframe.call('dashScrollToAnnotation', annotationId)
 
-  dashEdit: (annotationId, newText) -> 
-    @crossframe.call('dashEditAnnotation', annotationId, newText)
+  dashEdit: (annotationId, newHyperlink) -> 
+    @crossframe.call('dashEditAnnotation', annotationId, newHyperlink)
 
   # Create a blank comment (AKA "page note")
   createComment: () ->
