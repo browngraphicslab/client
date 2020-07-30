@@ -117,7 +117,7 @@ export default function AdderToolbar({
           shortcut={highlightShortcut}
         />
         <ToolbarButton
-          icon="annotate"
+          icon="link"
           onClick={e => handleCommand(e, 'linkToDash')}
           label="Link to Dash"
           shortcut={annotateShortcut}
