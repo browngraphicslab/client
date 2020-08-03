@@ -67,16 +67,19 @@ module.exports = class Guest extends Delegator
 
     self = this
     this.adderCtrl = new adder.Adder(@adder[0], {
-      onAnnotate: ->
-        self.createAnnotation()
+      onAnnotate: (isPlaceholder) ->
+        self.createAnnotation({}, isPlaceholder)
         document.getSelection().removeAllRanges()
-        parent.postMessage { 'message': 'annotation created' }, window.origin
       onHighlight: ->
         self.setVisibleHighlights(true)
         self.createHighlight()
         document.getSelection().removeAllRanges()
       onShowAnnotations: (anns) ->
         self.selectAnnotations(anns)
+      onScroll: (annotationId) ->
+        self.dashScroll(annotationId)
+      onEdit: (annotationId, link, command) -> 
+        self.dashEdit(annotationId, link, command)
     })
     this.selections = selections(document).subscribe
       next: (range) ->
@@ -180,10 +183,12 @@ module.exports = class Guest extends Delegator
           defaultNotPrevented = @element[0].dispatchEvent(event)
           if defaultNotPrevented
             scrollIntoView(anchor.highlights[0])
+      
+      document.dispatchEvent new Event('scrollSuccess') # notify Dash that annotations were loaded and scrolling was successful
 
-    crossframe.on 'linkToDash', (id) => 
+    crossframe.on 'linkToDash', (id, uri) => 
       document.dispatchEvent new CustomEvent('linkToDash', {
-        detail: id
+        detail: id + ' ' + uri # how to pass in multiple values in coffeescript??
         bubbles: true
       })
 
@@ -336,7 +341,7 @@ module.exports = class Guest extends Delegator
       highlighter.removeHighlights(unhighlight)
       this.plugins.BucketBar?.update()
 
-  createAnnotation: (annotation = {}) ->
+  createAnnotation: (annotation = {}, isPlaceholder = false) ->
     self = this
     root = @element[0]
 
@@ -361,20 +366,30 @@ module.exports = class Guest extends Delegator
       source = info.uri
       annotation.target = ({source, selector} for selector in selectors)
 
+    annotation.isPlaceholder = isPlaceholder
+
     info = this.getDocumentInfo()
     selectors = Promise.all(ranges.map(getSelectors))
 
-    metadata = info.then(setDocumentInfo)
+    metadata = info.then(setDocumentInfo)    
     targets = Promise.all([info, selectors]).then(setTargets)
 
     targets.then(-> self.publish('beforeAnnotationCreated', [annotation]))
     targets.then(-> self.anchor(annotation))
 
-   # @crossframe?.call('showSidebar') unless annotation.$highlight
+    if !isPlaceholder
+      @crossframe?.call('showSidebar') unless annotation.$highlight 
+
     annotation
 
   createHighlight: ->
     return this.createAnnotation({$highlight: true})
+
+  dashScroll: (annotationId) -> 
+    @crossframe.call('dashScrollToAnnotation', annotationId)
+
+  dashEdit: (annotationId, link, command) -> 
+    @crossframe.call('dashEditAnnotation', annotationId, link, command)
 
   # Create a blank comment (AKA "page note")
   createComment: () ->
@@ -510,3 +525,4 @@ module.exports = class Guest extends Delegator
 
     @visibleHighlights = shouldShowHighlights
     @toolbar?.highlightsVisible = shouldShowHighlights
+ 

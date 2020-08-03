@@ -74,7 +74,7 @@
 @mixin button--labeled {
   @include button;
   color: var.$grey-mid;
-  font-weight: 700;
+  font-weight: 500;
   background-color: var.$grey-1;
 
   &:hover:not([disabled]) {

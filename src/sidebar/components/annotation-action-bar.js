@@ -78,15 +78,15 @@ function AnnotationActionBar({
   };
 
   const onDashLink = useCallback(
-    id => {
-      frameSync.linkToDash(id);
+    (id, uri) => {
+      frameSync.linkToDash(id, uri);
     },
     [frameSync]
   );
 
   return (
     <div className="annotation-action-bar u-layout-row">
-      <Button icon="link" title="Link to Dash" onClick={() => onDashLink(annotation.id)}/>
+      <Button icon="link" title="Link to Dash" onClick={() => onDashLink(annotation.id, annotation.uri)}/>
       {showEditAction && <Button icon="edit" title="Edit" onClick={onEdit} />}
       {showDeleteAction && (
         <Button icon="trash" title="Delete" onClick={onDelete} />

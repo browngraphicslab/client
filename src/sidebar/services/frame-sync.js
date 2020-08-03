@@ -117,7 +117,7 @@ export default function FrameSync(annotationsService, bridge, store) {
    */
   function setupSyncFromFrame() {
     // A new annotation, note or highlight was created in the frame
-    bridge.on('beforeCreateAnnotation', function (event) {
+    bridge.on('beforeCreateAnnotation', async function (event) {
       const annot = Object.assign({}, event.msg, { $tag: event.tag });
       // If user is not logged in, we can't really create a meaningful highlight
       // or annotation. Instead, we need to open the sidebar, show an error,
@@ -132,7 +132,8 @@ export default function FrameSync(annotationsService, bridge, store) {
       inFrame.add(event.tag);
 
       // Create the new annotation in the sidebar.
-      annotationsService.create(annot);
+      const newAnnotation = await annotationsService.create(annot);
+      annot.isPlaceholder && bridge.call('linkToDash', newAnnotation.id, newAnnotation.uri); // after annotation is saved, start link in Dash if it's a placeholder
     });
 
     bridge.on('destroyFrame', destroyFrame.bind(this));
@@ -174,6 +175,40 @@ export default function FrameSync(annotationsService, bridge, store) {
 
     bridge.on('sidebarOpened', function () {
       store.setSidebarOpened(true);
+    });
+
+    bridge.on('dashScrollToAnnotation', function (annotationId) {
+      const annotation = store.findAnnotationByID(annotationId);
+      const tag = annotation && annotation.$orphan === false
+        ? annotation.$tag 
+        : null;
+      if (tag) {
+        store.focusAnnotations([tag]);
+        bridge.call('focusAnnotations', [tag]);
+        bridge.call('scrollToAnnotation', tag);
+      } else {
+        console.log(`DASH: annotation ${annotation ? "" : "tag"} not found`, annotationId);
+      }
+    });
+
+    bridge.on('dashEditAnnotation', function (annotationId, link, command) {
+      const annotation = store.findAnnotationByID(annotationId);
+      if (annotation) {
+        const oldText = annotation.text
+        const newAnnotation = Object.assign({}, annotation);
+        switch (command) {
+          case "add":
+            newAnnotation.text = (oldText === "placeholder") ? link : oldText + '\n\n' + link; // if this is not the first hyperlink in the annotation, add link on new line
+            break;
+          case "delete":
+            const regex = new RegExp(`\\[[^\\]]*\\]\\(${link}\\)`); // finds the link (written in [title](hyperlink) format) to be deleted
+            newAnnotation.text = oldText.replace(regex, ""); // deletes the target link
+            break;
+        };
+        annotationsService.save(newAnnotation);
+      } else {
+        console.log("DASH: annotation not found" + annotationId);
+      }
     });
 
     // These invoke the matching methods by name on the Guests
@@ -252,7 +287,7 @@ export default function FrameSync(annotationsService, bridge, store) {
     bridge.call('scrollToAnnotation', tag);
   };
   
-  this.linkToDash = function (id) {
-    bridge.call('linkToDash', id)
+  this.linkToDash = function (id, uri) {
+    bridge.call('linkToDash', id, uri)
   }
 }

@@ -23,6 +23,8 @@ import CrossFramePlugin from './plugin/cross-frame';
 import DocumentPlugin from './plugin/document';
 import PDFPlugin from './plugin/pdf';
 import Sidebar from './sidebar';
+import { useEffect } from 'preact/hooks';
+import useStore from '../sidebar/store/use-store';
 import * as DashUtil from './util/dash-util';
 
 const pluginClasses = {

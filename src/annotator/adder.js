@@ -53,8 +53,10 @@ function nearestPositionedAncestor(el) {
 
 /**
  * @typedef AdderOptions
- * @prop {() => any} onAnnotate - Callback invoked when "Annotate" button is clicked
+ * @prop {(isPlaceholder) => any} onAnnotate - Callback invoked when "Annotate" button is clicked
  * @prop {() => any} onHighlight - Callback invoked when "Highlight" button is clicked
+ * @prop {(annotationId) => any} onScroll - Callback invoked when "Highlight" button is clicked
+ * @prop {(annotationId, newText) => any} onEdit - Callback invoked when "Highlight" button is clicked
  * @prop {(annotations: Object[]) => any} onShowAnnotations -
  *   Callback invoked when  "Show" button is clicked
  */
@@ -106,8 +108,9 @@ export class Adder {
     this._arrowDirection = 'up';
     this._onAnnotate = options.onAnnotate;
     this._onHighlight = options.onHighlight;
+    this._onScroll = options.onScroll;
+    this._onEdit = options.onEdit;
     this._onShowAnnotations = options.onShowAnnotations;
-
     /**
      * Annotation objects associated with the current selection. If non-empty,
      * a "Show" button appears in the toolbar. Clicking the button calls the
@@ -212,11 +215,35 @@ export class Adder {
     this._render();
   }
 
+  _scroll(e) {
+    console.log("DASH scrollToAnnotation received");
+    const annotationId = e.detail;
+    this._onScroll(annotationId);
+  }
+
+  _addLink(e) {
+    console.log("DASH addLink received");
+    const annotationId = e.detail.id;
+    const newHyperlink = e.detail.newHyperlink
+    this._onEdit(annotationId, newHyperlink, "add");
+  }
+
+  _deleteLink(e) {
+    console.log("DASH deleteLink received");
+    const annotationId = e.detail.id;
+    const targetUrl = e.detail.targetUrl
+    this._onEdit(annotationId, targetUrl, "delete");
+  }
+
   _render() {
     const handleCommand = command => {
       switch (command) {
         case 'annotate':
-          this._onAnnotate();
+          this._onAnnotate(false);
+          this.hide();
+          break;
+        case 'linkToDash':
+          this._onAnnotate(true);
           this.hide();
           break;
         case 'highlight':
@@ -230,6 +257,15 @@ export class Adder {
           break;
       }
     };
+
+    document.removeEventListener('scrollToAnnotation', this._scroll.bind(this));
+    document.addEventListener('scrollToAnnotation', this._scroll.bind(this));
+
+    document.removeEventListener('addLink', this._addLink.bind(this));
+    document.addEventListener('addLink', this._addLink.bind(this));
+
+    document.removeEventListener('deleteLink', this._deleteLink.bind(this));
+    document.addEventListener('deleteLink', this._deleteLink.bind(this));
 
     render(
       <AdderToolbar
