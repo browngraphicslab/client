@@ -183,9 +183,11 @@ export default function FrameSync(annotationsService, bridge, store) {
         ? annotation.$tag 
         : null;
       if (tag) {
+        store.focusAnnotations([tag]);
+        bridge.call('focusAnnotations', [tag]);
         bridge.call('scrollToAnnotation', tag);
       } else {
-        console.log("DASH: annotation not found" + annotationId);
+        console.log(`DASH: annotation ${annotation ? "" : "tag"} not found`, annotationId);
       }
     });
 
