@@ -38,6 +38,7 @@ module.exports = class Host extends Guest
     .attr('seamless', '')
     .attr('src', sidebarAppSrc)
     .attr('title', 'Hypothesis annotation viewer')
+    .attr('id', 'hyp_sidebar')
     .addClass('h-sidebar-iframe')
 
     externalContainer = null
