@@ -187,10 +187,14 @@ module.exports = class Guest extends Delegator
       document.dispatchEvent new Event('scrollSuccess') # notify Dash that annotations were loaded and scrolling was successful
 
     crossframe.on 'linkToDash', (id, uri) => 
+      console.log("linkToDash guest.coffee")
       document.dispatchEvent new CustomEvent('linkToDash', {
         detail: id + ' ' + uri # how to pass in multiple values in coffeescript??
         bubbles: true
       })
+
+    crossframe.on 'dashEditSuccess', () =>
+      document.dispatchEvent new Event('editSuccess')
 
     crossframe.on 'getDocumentInfo', (cb) =>
       this.getDocumentInfo()

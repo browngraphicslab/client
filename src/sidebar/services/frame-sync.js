@@ -206,6 +206,7 @@ export default function FrameSync(annotationsService, bridge, store) {
             break;
         };
         annotationsService.save(newAnnotation);
+        bridge.call('dashEditSuccess');
       } else {
         console.log("DASH: annotation not found" + annotationId);
       }
