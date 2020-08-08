@@ -25,7 +25,6 @@ import PDFPlugin from './plugin/pdf';
 import Sidebar from './sidebar';
 import { useEffect } from 'preact/hooks';
 import useStore from '../sidebar/store/use-store';
-import * as DashUtil from './util/dash-util';
 
 const pluginClasses = {
   // UI plugins
@@ -72,21 +71,4 @@ $.noConflict(true)(function () {
     appLinkEl.parentElement.removeChild(appLinkEl);
     annotator.destroy();
   });
-
-  // Listen to 'hypothesisLink' event from Dash
-  // Modify the placeholder annotation's text content to the linked Dash document URL
-  document.addEventListener('editRequest', async function (e) {
-    console.log("DASH editRequest received");
-    let apiKey = e.detail.apiKey;
-    let annotationId = e.detail.id;
-    let text = e.detail.newText;
-
-    let patchResponse = await DashUtil.editAnnotation(annotationId, apiKey, text); // modify the placeholder annotation
-  
-    // notify dash that the link has been completed, with the URL of the annotated website
-    document.dispatchEvent(new CustomEvent("linkComplete", {
-      detail: patchResponse.uri,
-      bubbles: true
-    }));
-  })
 });
