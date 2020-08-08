@@ -187,7 +187,7 @@ module.exports = class Guest extends Delegator
       document.dispatchEvent new Event('scrollSuccess') # notify Dash that annotations were loaded and scrolling was successful
 
     crossframe.on 'linkToDash', (id, uri) => 
-      console.log("linkToDash guest.coffee")
+      console.log("client linkToDash")
       document.dispatchEvent new CustomEvent('linkToDash', {
         detail: id + ' ' + uri # how to pass in multiple values in coffeescript??
         bubbles: true
@@ -443,20 +443,21 @@ module.exports = class Guest extends Delegator
     @crossframe?.call('focusAnnotations', tags)
 
   _onSelection: (range) ->
-    selection = document.getSelection()
-    isBackwards = rangeUtil.isSelectionBackwards(selection)
-    focusRect = rangeUtil.selectionFocusRect(selection)
-    if !focusRect
-      # The selected range does not contain any text
-      this._onClearSelection()
-      return
+    if (document.body.id != "dash-body") # only annotate iframes within Dash, not any Dash documents
+      selection = document.getSelection()
+      isBackwards = rangeUtil.isSelectionBackwards(selection)
+      focusRect = rangeUtil.selectionFocusRect(selection)
+      if !focusRect
+        # The selected range does not contain any text
+        this._onClearSelection()
+        return
 
-    @selectedRanges = [range]
-    @toolbar?.newAnnotationType = 'annotation'
+      @selectedRanges = [range]
+      @toolbar?.newAnnotationType = 'annotation'
 
-    {left, top, arrowDirection} = this.adderCtrl.target(focusRect, isBackwards)
-    this.adderCtrl.annotationsForSelection = annotationsForSelection()
-    this.adderCtrl.showAt(left, top, arrowDirection)
+      {left, top, arrowDirection} = this.adderCtrl.target(focusRect, isBackwards)
+      this.adderCtrl.annotationsForSelection = annotationsForSelection()
+      this.adderCtrl.showAt(left, top, arrowDirection)
 
   _onClearSelection: () ->
     this.adderCtrl.hide()

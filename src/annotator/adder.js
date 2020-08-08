@@ -216,20 +216,17 @@ export class Adder {
   }
 
   _scroll(e) {
-    console.log("DASH scrollToAnnotation received");
     const annotationId = e.detail;
     this._onScroll(annotationId);
   }
 
   _addLink(e) {
-    console.log("DASH addLink received");
     const annotationId = e.detail.id;
     const newHyperlink = e.detail.newHyperlink
     this._onEdit(annotationId, newHyperlink, "add");
   }
 
   _deleteLink(e) {
-    console.log("DASH deleteLink received");
     const annotationId = e.detail.id;
     const targetUrl = e.detail.targetUrl
     this._onEdit(annotationId, targetUrl, "delete");
